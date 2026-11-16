@@ -70,10 +70,79 @@ birthday_summary |>
 Across 10,000 simulations per group size, the estimated probability of at ≥1 shared birthday increased with bigger group size. For example, the probability was 0.28% with 2 people, 57.5% with 25 people, and 96.8% with 50 people. This occurs because larger groups contain more pairs of people who could share a birthday.
 
 ## Problem 2
-```{r}
+```{r, tidy_data}
+
+# Create a tidy dataframe containing data from all participants
+study_df =
+  tibble(
+    file_name = list.files(
+      path = "data",
+      pattern = "\\.csv$"
+    )
+  ) |>
+  mutate(
+    data = purrr::map(
+      file_name,
+      \(file) read_csv(str_c("data/", file))
+    )
+  )
+
+# Extract arm and subject ID, combine data, and "tidy" weekly observations
+study_tidy =
+  study_df |>
+  mutate(
+    file_name = str_replace(file_name, "\\.csv$", "")
+  ) |>
+  separate(
+    file_name,
+    into = c("arm", "subject_id"),
+    sep = "_"
+  ) |>
+  mutate(
+    arm = recode(
+      arm,
+      con = "Control",
+      exp = "Experimental"
+    )
+  ) |>
+  unnest(cols = data) |>
+  pivot_longer(
+    cols = starts_with("week_"),
+    names_to = "week",
+    names_prefix = "week_",
+    values_to = "observation"
+  ) |>
+  mutate(
+    week = as.integer(week)
+  )
+
+study_tidy
+```
+
+```{r spaghetti_plot, fig.width=8, fig.height=5}
+study_tidy |>
+  ggplot(
+    aes(
+      x = week,
+      y = observation,
+      group = interaction(arm, subject_id),
+      color = arm
+    )
+  ) +
+  geom_line(alpha = 0.7) +
+  geom_point(size = 1.5) +
+  scale_x_continuous(breaks = 1:8) +
+  labs(
+    title = "Participant observations over time",
+    x = "Week",
+    y = "Observation",
+    color = "Study arm"
+  ) +
+  theme_minimal(base_size = 12)
 
 ```
 
+Observations in the control and experimental arms followed different trajectories over the eight-week period. The experimental arm generally showed increasing observations, while the control arm remained relatively stable with no consistent trend. The groups overlapped initially but became more separated at later weeks, with higher observations in the experimental arm. Both groups showed variation between participants and week-to-week fluctuations within participants.
 
 ## Problem 3
 ```{r}
