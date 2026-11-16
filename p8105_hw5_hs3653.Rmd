@@ -224,7 +224,7 @@ power_summary |>
   theme_minimal(base_size = 12)
 ```
 
-With sample size and standard deviation fixed, power increased as the true population mean moved further from the null value of 0, corresponding to a larger effect size. For example, power was 18.4% at a true mean of 1, 56.7% at 2, and 89.2% at 3, approaching 100% for true means ≥4. Larger effects were therefore more likely to be detected with the same sample size and variability. When the true mean was 0, 5.16% of tests rejected the null, close to the expected Type I error rate of 5%.
+With sample size and standard deviation fixed, power increased as the true population mean moved further from the null value of 0, corresponding to a larger effect size. For example, power was `r round(100 * power_summary$rejection_rate[power_summary$true_mu == 1], 1)`% at a true mean of 1, `r round(100 * power_summary$rejection_rate[power_summary$true_mu == 2], 1)`% at 2, and `r round(100 * power_summary$rejection_rate[power_summary$true_mu == 3], 1)`% at 3, approaching 100% for true means ≥4. Larger effects were therefore more likely to be detected with the same sample size and variability. When the true mean was 0, `r round(100 * power_summary$rejection_rate[power_summary$true_mu == 0], 2)`% of tests rejected the null, close to the expected Type I error rate of 5%.
 
 ```{r, mu_estimate_summary}
 estimate_summary =
@@ -280,4 +280,4 @@ estimate_summary |>
   theme(legend.position = "bottom")
 ```
 
-Across all simulated datasets, the average estimated mean was close to the true mean. Among datasets that rejected the null (p < 0.05), small positive effects were overestimated. For example, when the true mean was 1, the average estimate among significant datasets was 2.24. Because sample means vary across datasets, selecting only significant results favors higher estimates and raises the average above the true mean. As power increased, nearly all datasets rejected the null, and the average estimate approached the true mean. When the true mean was 0, positive and negative significant estimates tended to cancel out, leaving an average close to zero both for all samples and for the rejected null subset.
+Across all simulated datasets, the average estimated mean was close to the true mean. Among datasets that rejected the null (p < 0.05), small positive effects were overestimated. For example, when the true mean was 1, the average estimate among significant datasets was `r round(estimate_summary$mean_rejected[estimate_summary$true_mu == 1], 2)`. Because sample means vary across datasets, selecting only significant results favors higher estimates and raises the average above the true mean. As power increased, nearly all datasets rejected the null, and the average estimate approached the true mean. When the true mean was 0, positive and negative significant estimates tended to cancel out, leaving an average close to zero both for all samples and for the rejected null subset.
